@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
 
     private bool _isInMovement = false;
     private float _currentDistance = 0f;
+    private float _currentDir = 0f;
 
     private void Update()
     {
@@ -22,6 +23,9 @@ public class PlayerController : MonoBehaviour
         if (_isInMovement == false && dir != 0)
         {
             _isInMovement = true;
+            _currentDir = dir;
+            _currentDistance = _distance;
+
             if (dir > 0)
             {
                 _animator.SetTrigger("Right");
@@ -34,11 +38,11 @@ public class PlayerController : MonoBehaviour
 
         if (_isInMovement)
         {
-            Move(dir);
+            Move();
         }
     }
 
-    private void Move(float dir)
+    private void Move()
     {
         if (_currentDistance <= 0)
         {
@@ -47,6 +51,15 @@ public class PlayerController : MonoBehaviour
         }
         float speed = _distance / _time;
         float tmpDist = Time.deltaTime * speed;
-        _characterController.Move(Vector3.right * dir * tmpDist);
+        _characterController.Move(Vector3.right * _currentDir * tmpDist);
+        _currentDistance -= tmpDist;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Danger")) 
+        {
+            _animator.SetTrigger("Death");
+        }
     }
 }
